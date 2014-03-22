@@ -1,11 +1,11 @@
 {
 	"extName": {
-		"message": "Exif Spy",
+		"message": "exifspy",
 		"description": "Quick access to GEO data of images on webpages"
 	},
 	"extDescription": {
-	    "message": "Shows place at Google Maps for images with GEO data.",
-	    "description": "Simply right-click on image and choose the menu item “Show map.” The Google maps positioned at the place the image was taken will be shown in new tab."
+    "message": "Shows place at Google Maps for images with GEO data.",
+    "description": "Simply right-click on image and choose the menu item “Show map.” The Google maps positioned at the place the image was taken will be shown in new tab."
 	},
 	"menuItemCaption": {
 		"message": "Show map",
