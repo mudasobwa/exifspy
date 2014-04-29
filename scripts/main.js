@@ -1,5 +1,11 @@
+var googlemapsapikey = '';
+
 function updateImgBorders() {
 	$('img').each(function(index, image) {
+		if (($(image).width() < 100) && ($(image).height() < 100)) {
+			$(image).attr("exif", false);
+			return;
+		}
 		$(image).exifLoad(function() {
 			var aLat = $(image).exif("GPSLatitude")[0];
 			var aLon = $(image).exif("GPSLongitude")[0];
@@ -13,8 +19,8 @@ function updateImgBorders() {
 			if('true' !== $(image).attr("exif"))
 				return;
 
-			var strLatRef = $(image).exif("GPSLatitudeRef") || "N";
-			var strLonRef = $(image).exif("GPSLongitudeRef") || "W";
+			var strLatRef = $(image).exif("GPSLatitudeRef")[0]  || "N";
+			var strLonRef = $(image).exif("GPSLongitudeRef")[0] || "W";
 
 			var fLat = (aLat[0] + aLat[1] / 60 + aLat[2] / 3600) * (strLatRef === "N" ? 1 : -1);
 			var fLon = (aLon[0] + aLon[1] / 60 + aLon[2] / 3600) * (strLonRef === "W" ? -1 : 1);
@@ -27,8 +33,14 @@ function updateImgBorders() {
 			$(image).attr("data-gps-latitude-pretty", sLat);
 			$(image).attr("data-gps-longitude-pretty", sLon);
 			$(image).attr("title", "[" +
-					$(image).attr("data-gps-latitude-pretty") + ", " +
-					$(image).attr("data-gps-longitude-pretty") + "]");
+				$(image).attr("data-gps-latitude-pretty") + ", " +
+				$(image).attr("data-gps-longitude-pretty") + "]"
+			);
+			chrome.runtime.sendMessage( { method: 'getAddressByLatLng', lat: fLat.toFixed(7), lon: fLon.toFixed(7) }, function(response) {
+        console.log(response);
+				if(response.address)
+					$(image).attr("title", response.address);
+			});
 			$(image).css({
 			  "border-color": $('#exifspyborderexample').css('border-color'),
 			  "border-width": $('#exifspyborderexample').css('border-width'),
@@ -42,6 +54,9 @@ $(document).ready(function() {
 	$("body").append("<div id='exifspyborderexample' style='border: maroon 1px solid; display: none;'></div>");
 
 	chrome.storage.onChanged.addListener(function(changes, namespace) {
+		if (typeof changes['googlemapsapikey'] !== 'undefined') {
+			googlemapsapikey = changes['exifspybordercolor'];
+		}
 		if (typeof changes['exifspybordercolor'] !== 'undefined') {
 			$('#exifspyborderexample').css('border-color', changes['exifspybordercolor']);
 		}
@@ -52,12 +67,15 @@ $(document).ready(function() {
 	});
 
 	chrome.storage.sync.get({
+			googlemapsapikey: '',
 			exifspybordercolor: 'maroon',
 			exifspyborderwidth: '1px'
 		}, function(items) {
+			googlemapsapikey = items.googlemapsapikey;
 			$('#exifspyborderexample').css('border-color', items.exifspybordercolor);
 			$('#exifspyborderexample').css('border-width', items.exifspyborderwidth);
 		});
 	updateImgBorders();
+
 });
 

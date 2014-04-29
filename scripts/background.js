@@ -22,12 +22,36 @@ var showMapItem = chrome.contextMenus.create({
   "onclick" : getClickHandler
 });
 
-chrome.runtime.onMessage.addListener(function(message){
-	if(message.method === "showLocation" && message.lat && message.lon) {
-		// https://www.google.com/maps/place/41°22'52.0"N+2°07'12.0"E
-		var mapsUrl = "https://www.google.com/maps/place/" + message.lat + "+" + message.lon;
-		chrome.tabs.create( {url:mapsUrl} );
-	} else if(message.method === "updateMenu" && message.hasmap) {
-		chrome.contextMenus.update(showMapItem, {enabled: 'true' === message.hasmap}, function(cb) {});
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
+	switch(message.method) {
+		case "showLocation":
+			// https://www.google.com/maps/place/41°22'52.0"N+2°07'12.0"E
+			if(message.lat && message.lon)
+				chrome.tabs.create( { url: "https://www.google.com/maps/place/" + message.lat + "+" + message.lon } );
+			break;
+		case "updateMenu":
+			chrome.contextMenus.update(showMapItem, {enabled: 'true' === message.hasmap});
+			break;
+		case "getAddressByLatLng":
+			var latlng = new google.maps.LatLng(Number(message.lat), Number(message.lon));
+			var geocoder = new google.maps.Geocoder();
+			geocoder.geocode( { latLng: latlng }, function(results, status) {
+				switch(status) {
+					case google.maps.GeocoderStatus.OK:
+						sendResponse( { address: results[0] ? results[0].formatted_address : null } );
+						console.log( { address: results[0] ? results[0].formatted_address : null } );
+						break;
+					case google.maps.GeocoderStatus.OVER_QUERY_LIMIT:
+						setTimeout(function() {
+							chrome.runtime.sendMessage( { method: 'getAddressByLatLng', lat: message.lat, lon: message.lon }, sendResponse );
+						}, 200);
+						break;
+					case google.maps.GeocoderStatus.ZERO_RESULTS:
+					default:
+						console.log(status + ' (for latlng=[' + message.lat + ', ' + message.lon + '])');
+				}
+			});
+			break;
 	}
 });
+

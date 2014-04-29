@@ -1,19 +1,25 @@
 {
 	"name": "__MSG_extName__",
-  "default_locale": "en",
-	"version": "0.9",
+	"default_locale": "en",
+	"version": "0.9.3",
 	"manifest_version" : 2,
 	"description": "__MSG_extDescription__",
 	"background" : {
-    "scripts": ["scripts/background.js"]
+		"scripts": [
+			"scripts/gmapi.js",
+			"scripts/background.js"
+		]
 	},
-  "permissions" : [
-    "contextMenus",
-    "tabs",
-    "storage",
-    "http://*/*",
-    "https://*/*"
-  ],
+	"permissions" : [
+		"contextMenus",
+		"tabs",
+		"storage",
+		"geolocation",
+		"https://maps.google.com/*",
+		"https://maps.googleapis.com/*",
+		"http://*/*",
+		"https://*/*"
+	],
 	"page_action" : {
 		"default_icon": {
 			"16": "icons/16.png",
@@ -25,17 +31,18 @@
 		"default_title" : "__MSG_extName__"
 	},
 	"content_scripts": [
-    {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["lib/jquery-2.0.3.min.js","lib/jquery.exif.js","scripts/main.js"]
-    }
+	{
+		"matches": ["http://*/*", "https://*/*"],
+		"js": ["lib/jquery-2.0.3.min.js","lib/jquery.exif.js","scripts/main.js"]
+	}
 	],
-  "minimum_chrome_version" : "16.0.0.0",
-  "web_accessible_resources": ["lib/jquery-2.0.3.min.map"],
+	"minimum_chrome_version" : "16.0.0.0",
+	"web_accessible_resources": ["lib/jquery-2.0.3.min.map"],
 	"icons": {
 		"16": "icons/16.png",
 		"48": "icons/48.png",
 		"128": "icons/128.png"
 	},
-	"options_page" : "options.html"
+	"options_page" : "options.html",
+	"content_security_policy": "script-src 'self' 'unsafe-eval' https://maps.googleapis.com https://maps.gstatic.com; object-src 'self'"
 }
