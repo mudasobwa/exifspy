@@ -1,6 +1,6 @@
 /** Opens new tab with google maps, opened at the place the photo was taken */
 function getClickHandler(info, tab) {
-  chrome.tabs.executeScript(tab.id, {code:"" +
+  chrome.tabs.executeScript(tab.id, {code: "" +
     "var lat = null;" +
     "var lon = null;" +
     "for(var i = 0; i < document.images.length; ++i) {" +
@@ -15,7 +15,7 @@ function getClickHandler(info, tab) {
 };
 
 /** Create a context menu which will only show up for images and selections. */
-chrome.contextMenus.create({
+var showMapItem = chrome.contextMenus.create({
   "title" : chrome.i18n.getMessage("menuItemCaption"),
   "type" : "normal",
   "contexts" : ["image"],
@@ -23,9 +23,11 @@ chrome.contextMenus.create({
 });
 
 chrome.runtime.onMessage.addListener(function(message){
-  if(message.method === "showLocation" && message.lat && message.lon) {
-    // https://www.google.com/maps/place/41°22'52.0"N+2°07'12.0"E
-    var mapsUrl = "https://www.google.com/maps/place/" + message.lat + "+" + message.lon;
-    chrome.tabs.create( {url:mapsUrl} );
-  }
+	if(message.method === "showLocation" && message.lat && message.lon) {
+		// https://www.google.com/maps/place/41°22'52.0"N+2°07'12.0"E
+		var mapsUrl = "https://www.google.com/maps/place/" + message.lat + "+" + message.lon;
+		chrome.tabs.create( {url:mapsUrl} );
+	} else if(message.method === "updateMenu" && message.hasmap) {
+		chrome.contextMenus.update(showMapItem, {enabled: 'true' === message.hasmap}, function(cb) {});
+	}
 });
