@@ -39,8 +39,6 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
 				switch(status) {
 					case google.maps.GeocoderStatus.OK:
 						sendResponse( { address: results[0] ? results[0].formatted_address : null } );
-						console.log( { address: results[0] ? results[0].formatted_address : null } );
-						break;
 					case google.maps.GeocoderStatus.OVER_QUERY_LIMIT:
 						setTimeout(function() {
 							chrome.runtime.sendMessage( { method: 'getAddressByLatLng', lat: message.lat, lon: message.lon }, sendResponse );
@@ -53,5 +51,6 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
 			});
 			break;
 	}
+	return true;
 });
 

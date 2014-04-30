@@ -36,11 +36,13 @@ function updateImgBorders() {
 				$(image).attr("data-gps-latitude-pretty") + ", " +
 				$(image).attr("data-gps-longitude-pretty") + "]"
 			);
-			chrome.runtime.sendMessage( { method: 'getAddressByLatLng', lat: fLat.toFixed(7), lon: fLon.toFixed(7) }, function(response) {
-        console.log(response);
-				if(response.address)
-					$(image).attr("title", response.address);
-			});
+			chrome.runtime.sendMessage( 
+				{ method: 'getAddressByLatLng', lat: fLat.toFixed(7), lon: fLon.toFixed(7) }, 
+				function(response) {
+					if(response.address)
+						$(image).attr("title", response.address);
+				}
+			);
 			$(image).css({
 			  "border-color": $('#exifspyborderexample').css('border-color'),
 			  "border-width": $('#exifspyborderexample').css('border-width'),
