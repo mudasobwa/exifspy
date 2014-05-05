@@ -32,14 +32,14 @@ function updateImgBorders() {
 			$(image).attr("data-gps-longitude", fLon);
 			$(image).attr("data-gps-latitude-pretty", sLat);
 			$(image).attr("data-gps-longitude-pretty", sLon);
-			chrome.runtime.sendMessage( 
-				{ method: 'getAddressByLatLng', lat: fLat.toFixed(7), lon: fLon.toFixed(7) }, 
+			chrome.runtime.sendMessage(
+				{ method: 'getAddressByLatLng', lat: fLat.toFixed(7), lon: fLon.toFixed(7) },
 				function(response) {
 					if(response && response.address)
 					{
 						var title = $(image).context.getAttribute("title");
 						title = (
-									(title === 'undefined' || title === null || title === '' || title.match(/^\[.*?\]$/)
+									(title === 'undefined' || title === null || title === '' || title.match(/^\[.*?\]$/)
 								) ? '@ ' : title + "\n@ ") + response.address;
 						$(image).attr("title", title);
 					}
