@@ -1,12 +1,11 @@
 {
 	"name": "__MSG_extName__",
 	"default_locale": "en",
-	"version": "0.9.4",
+	"version": "0.9.9",
 	"manifest_version" : 2,
 	"description": "__MSG_extDescription__",
 	"background" : {
 		"scripts": [
-			"scripts/gmapi.js",
 			"scripts/background.js"
 		]
 	},
@@ -43,6 +42,5 @@
 		"48": "icons/48.png",
 		"128": "icons/128.png"
 	},
-	"options_page" : "options.html",
-	"content_security_policy": "script-src 'self' 'unsafe-eval' https://maps.googleapis.com https://maps.gstatic.com; object-src 'self'"
+	"options_page" : "options.html"
 }

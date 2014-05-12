@@ -1,11 +1,11 @@
-var googlemapsapikey = '';
-
 function updateImgBorders() {
+	var counter = 0;
 	$('img').each(function(index, image) {
 		if (($(image).width() < 100) && ($(image).height() < 100)) {
 			$(image).attr("exif", false);
 			return;
 		}
+		counter += 1;
 		$(image).exifLoad(function() {
 			var aLat = $(image).exif("GPSLatitude")[0];
 			var aLon = $(image).exif("GPSLongitude")[0];
@@ -33,15 +33,24 @@ function updateImgBorders() {
 			$(image).attr("data-gps-latitude-pretty", sLat);
 			$(image).attr("data-gps-longitude-pretty", sLon);
 			chrome.runtime.sendMessage( 
-				{ method: 'getAddressByLatLng', lat: fLat.toFixed(7), lon: fLon.toFixed(7) }, 
+				{ method: 'getAddressByLatLng', id: counter, lat: sLat, lon: sLon }, 
 				function(response) {
-					if(response && response.address)
-					{
-						var title = $(image).context.getAttribute("title");
-						title = (
-									(title === 'undefined' || title === null || title === '' || title.match(/^\[.*?\]$/)
-								) ? '@ ' : title + "\n@ ") + response.address;
-						$(image).attr("title", title);
+					var datas = JSON.parse(response.results).response.GeoObjectCollection;
+					var address;
+					if(datas) {
+						for (var i = 0; i < datas.featureMember.length; i++) {
+							if (datas.featureMember[i].GeoObject.metaDataProperty.GeocoderMetaData.precision === 'street') {
+								address = datas.featureMember[i].GeoObject.metaDataProperty.GeocoderMetaData.text;
+								break;
+							}
+						}
+						if (address !== 'undefined') {
+							var title = $(image).context.getAttribute("title");
+							title = (
+										(title === 'undefined' || title === null || title === '' || title.match(/^\[.*?\]$/)
+									) ? '@ ' : title + "\n@ ") + address;
+							$(image).attr("title", title);
+						}
 					}
 				}
 			);
@@ -58,9 +67,6 @@ $(document).ready(function() {
 	$("body").append("<div id='exifspyborderexample' style='border: maroon 1px solid; display: none;'></div>");
 
 	chrome.storage.onChanged.addListener(function(changes, namespace) {
-		if (typeof changes['googlemapsapikey'] !== 'undefined') {
-			googlemapsapikey = changes['exifspybordercolor'];
-		}
 		if (typeof changes['exifspybordercolor'] !== 'undefined') {
 			$('#exifspyborderexample').css('border-color', changes['exifspybordercolor']);
 		}
@@ -75,7 +81,6 @@ $(document).ready(function() {
 			exifspybordercolor: 'maroon',
 			exifspyborderwidth: '1px'
 		}, function(items) {
-			googlemapsapikey = items.googlemapsapikey;
 			$('#exifspyborderexample').css('border-color', items.exifspybordercolor);
 			$('#exifspyborderexample').css('border-width', items.exifspyborderwidth);
 		});

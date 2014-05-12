@@ -33,22 +33,17 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
 			chrome.contextMenus.update(showMapItem, {enabled: 'true' === message.hasmap});
 			break;
 		case "getAddressByLatLng":
-			var latlng = new google.maps.LatLng(Number(message.lat), Number(message.lon));
-			var geocoder = new google.maps.Geocoder();
-			geocoder.geocode( { latLng: latlng }, function(results, status) {
-				switch(status) {
-					case google.maps.GeocoderStatus.OK:
-						sendResponse( { address: results[0] ? results[0].formatted_address : null } );
-					case google.maps.GeocoderStatus.OVER_QUERY_LIMIT:
-						setTimeout(function() {
-							chrome.runtime.sendMessage( { method: 'getAddressByLatLng', lat: message.lat, lon: message.lon }, sendResponse );
-						}, 200);
-						break;
-					case google.maps.GeocoderStatus.ZERO_RESULTS:
-					default:
-						console.log(status + ' (for latlng=[' + message.lat + ', ' + message.lon + '])');
+			var url = 'http://geocode-maps.yandex.ru/1.x/?lang=en-US&format=json&geocode='+message.lat+','+message.lon;
+			var xmlHttpReq = new XMLHttpRequest();
+			if(xmlHttpReq) {
+				xmlHttpReq.open('GET', url);
+				xmlHttpReq.onreadystatechange = function () {
+					if(xmlHttpReq.readyState == 4 && xmlHttpReq.status == 200) {
+						sendResponse( { results: xmlHttpReq.responseText } );
+					}
 				}
-			});
+				xmlHttpReq.send(null); //We pass 'null' to send because we are using 'GET'
+			}
 			break;
 	}
 	return true;
