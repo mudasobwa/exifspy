@@ -4,7 +4,7 @@ var jQuery = jQuery || null; // satisfying jslint
 var $ = $ || jQuery || null; // satisfying jslint
 var L = L || null;           // satisfying jslint
 
-var exifSpyMap = null;
+var exifSpyMap = exifSpyMap || null;
 var exifSpyMarkers = exifSpyMarkers || [];
 
 function handleLeaflet(iconsize, fLat, fLon, tooltip, hash) {

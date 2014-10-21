@@ -1,7 +1,7 @@
 {
     "name": "__MSG_extName__",
     "description": "__MSG_extDescription__",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "manifest_version": 2,
     "default_locale": "en",
     "icons": {
@@ -54,8 +54,8 @@
     "minimum_chrome_version": "16.0.0.0",
     "web_accessible_resources": [
         "bower_components/jquery/dist/jquery.min.map",
-		"icons/maps.png",
-		"lib/images/*"
+        "icons/maps.png",
+        "lib/images/*"
     ],
     "options_page": "options.html"
 }
