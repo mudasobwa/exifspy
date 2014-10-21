@@ -32,7 +32,7 @@ function restoreOptions() {
 		googlemapsapikey: '',
 		exifspybordercolor: 'maroon',
 		exifspyborderwidth: '1px',
-		exificonsize: 32
+		exificonsize: 16
 	}, function(items) {
 		document.getElementById('googlemapsapikey').value = items.googlemapsapikey;
 		document.getElementById('bordercolor').value = items.exifspybordercolor;
