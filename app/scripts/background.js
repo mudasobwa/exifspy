@@ -33,7 +33,7 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 			}
 			break;
 		case 'updateMenu':
-			chrome.contextMenus.update(showMapItem, {enabled: 'true' === message.hasmap});
+			chrome.contextMenus.update(showMapItem, {enabled: (message.hasmap === 'true')});
 			break;
 		case 'getAddressByLatLng':
 			var url = 'http://geocode-maps.yandex.ru/1.x/?lang=en-US&format=json&geocode='+message.lat+','+message.lon;

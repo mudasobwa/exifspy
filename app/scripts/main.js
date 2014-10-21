@@ -1,21 +1,21 @@
 'use strict';
 
-var jQuery = jQuery || null;
-var $ = $ || jQuery || null;
+var jQuery = jQuery || null; // satisfying jslint
+var $ = $ || jQuery || null; // satisfying jslint
 
-function updateImgBorders(color, width) {
+function updateImgBorders(color, width, iconsize) {
 	var counter = 0;
 	$('img').each(function(index, image) {
 		if (($(image).width() < 100) && ($(image).height() < 100)) {
 			$(image).attr('exif', false);
-			return;
+			return true;
 		}
-		counter += 1;
+
 		$(image).exifLoad(function() {
 			var aLat = $(image).exif('GPSLatitude')[0];
 			var aLon = $(image).exif('GPSLongitude')[0];
 
-			$(image).attr('exif', !(typeof aLat === 'undefined' || typeof aLon === 'undefined' || aLat === 0 || aLon === 0));
+			$(image).attr('exif', !(!aLat || !aLon));
 			$(image).context.onmousedown = function(event){
 				if(event.button === 2) {
 					chrome.runtime.sendMessage({method: 'updateMenu', hasmap: event.srcElement.attributes.getNamedItem('exif').value});
@@ -23,8 +23,10 @@ function updateImgBorders(color, width) {
 			};
 
 			if('true' !== $(image).attr('exif')) {
-				return;
+				return true;
 			}
+
+			counter += 1; // we yield an image with geotags
 
 			var strLatRef = $(image).exif('GPSLatitudeRef')[0]  || 'N';
 			var strLonRef = $(image).exif('GPSLongitudeRef')[0] || 'W';
@@ -34,6 +36,8 @@ function updateImgBorders(color, width) {
 			// 53°20′18″N,37°5′18″E
 			var sLat = '' + Math.round(aLat[0]) + '°' + Math.round(aLat[1]) + '′' + Math.round(aLat[2]) + '″' + strLatRef;
 			var sLon = '' + Math.round(aLon[0]) + '°' + Math.round(aLon[1]) + '′' + Math.round(aLon[2]) + '″' + strLonRef;
+
+			handleLeaflet(iconsize, fLat, fLon, sLat, sLon);
 
 			$(image).attr('data-gps-latitude', fLat);
 			$(image).attr('data-gps-longitude', fLon);
@@ -70,23 +74,72 @@ function updateImgBorders(color, width) {
 	});
 }
 
+var exifSpyMap = null;
+var exifSpyMarkers = exifSpyMarkers || [];
+
+function handleLeaflet(iconsize, fLat, fLon, sLat, sLon) {
+	if(!document.getElementById('expifspy-icon-mudasobwa-id')) {
+		var icon = document.createElement('img');
+		icon.id = 'expifspy-icon-mudasobwa-id';
+		icon.src = chrome.extension.getURL('icons/maps.png');
+		icon.alt = chrome.i18n.getMessage('leaflet_alt');
+		icon.title = chrome.i18n.getMessage('leaflet_title');
+		icon.width = iconsize;
+		icon.style.position = 'absolute';
+		icon.style.zIndex = 1000;
+		icon.style.cursor = 'pointer';
+		icon.style.top = icon.style.right = 0;
+		icon.addEventListener('click', function() {
+			var leaflet = document.getElementById('expifspy-leaflet-mudasobwa-id');
+			if(leaflet) {
+				leaflet.style.display = (leaflet.style.display === 'none') ? 'block' : 'none';
+			}
+		}, false);
+		document.body.appendChild(icon);
+	}
+	if(!document.getElementById('expifspy-leaflet-mudasobwa-id')) { /* create div to draw leaflet */
+		var leaflet = document.createElement('div');
+		leaflet.class = leaflet.id = 'expifspy-leaflet-mudasobwa-id';
+		leaflet.style.position = 'absolute';
+		leaflet.style.zIndex = 1001;
+		leaflet.style.top = leaflet.style.right = (+iconsize - Math.floor(+iconsize / 8)) + 'px';
+		leaflet.style.width = Math.min(window.innerWidth, 400) + 'px';
+		leaflet.style.height = Math.min(window.innerHeight, 300) + 'px';
+		leaflet.style.border = '1px solid #ddd';
+		// leaflet.style.display = 'none';
+		document.body.appendChild(leaflet);
+	}
+
+	if(!exifSpyMap) {
+		L.Icon.Default.imagePath = chrome.extension.getURL('lib/images');
+		exifSpyMap = L.map(leaflet.id).setView([fLat, fLon], 13);
+
+		// add an OpenStreetMap tile layer
+		L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+			attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+		}).addTo(exifSpyMap);
+	}
+
+	// add a marker in the given location, attach some popup content to it and open the popup
+	L.marker([fLat, fLon]).addTo(exifSpyMap)
+		.bindPopup('' + sLat + '<br>' + sLon); // .openPopup();
+	exifSpyMarkers.push(L.latLng(fLat, fLon));
+	exifSpyMap.fitBounds(L.latLngBounds(exifSpyMarkers));
+	
+}
+
 $(document).ready(function() {
 	chrome.storage.onChanged.addListener(function(changes) {
-		if (typeof changes.exifspybordercolor !== 'undefined') {
-			$('#exifspyborderexample').css('border-color', changes.exifspybordercolor);
-		}
-		if (typeof changes.exifspyborderwidth !== 'undefined') {
-			$('#exifspyborderexample').css('border-width', changes.exifspyborderwidth);
-		}
-		updateImgBorders();
+		updateImgBorders(changes.exifspybordercolor, changes.exifspyborderwidth, changes.exificonsize);
 	});
 
 	chrome.storage.sync.get({
 			googlemapsapikey: '',
 			exifspybordercolor: 'maroon',
-			exifspyborderwidth: '1px'
+			exifspyborderwidth: '1px',
+			exificonsize: 32
 		}, function(items) {
-			updateImgBorders(items.exifspybordercolor, items.exifspyborderwidth);
+			updateImgBorders(items.exifspybordercolor, items.exifspyborderwidth, items.exificonsize);
 		});
 
 });

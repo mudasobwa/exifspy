@@ -43,13 +43,19 @@
             "js": [
                 "bower_components/jquery/dist/jquery.min.js",
                 "lib/jquery.exif.js",
+                "lib/leaflet.js",
                 "scripts/main.js"
+            ],
+            "css": [
+                "lib/leaflet.css"
             ]
         }
     ],
     "minimum_chrome_version": "16.0.0.0",
     "web_accessible_resources": [
-        "bower_components/jquery/dist/jquery.min.map"
+        "bower_components/jquery/dist/jquery.min.map",
+		"icons/maps.png",
+		"lib/images/*"
     ],
     "options_page": "options.html"
 }

@@ -10,5 +10,13 @@
 	"menuItemCaption": {
 		"message": "Show map",
 		"description": "Shows the Google Map with this place in new tab."
+	},
+	"leaflet_alt": {
+		"message": "Show map",
+		"description": "Shows the Leaflet Map with markers of places found on that page"
+	},
+	"leaflet_title": {
+		"message": "Shows the Leaflet Map with markers of places found on that page",
+		"description": "Shows the Leaflet Map with markers of places found on that page"
 	}
 }
