@@ -15,14 +15,14 @@ function handleLeaflet(iconsize, fLat, fLon, tooltip, hash) {
 		icon.alt = chrome.i18n.getMessage('leaflet_alt');
 		icon.title = chrome.i18n.getMessage('leaflet_title');
 		icon.width = iconsize;
-		icon.style.position = 'absolute';
+		icon.style.position = 'fixed';
 		icon.style.zIndex = 1000;
 		icon.style.cursor = 'pointer';
 		icon.style.top = icon.style.right = 0;
 		icon.addEventListener('click', function() {
 			var leaflet = document.getElementById('expifspy-leaflet-mudasobwa-id');
 			if(leaflet) {
-				leaflet.style.display = (leaflet.style.display === 'none') ? 'block' : 'none';
+				leaflet.style.right = leaflet.style.right === '-10000px' ? (+iconsize - Math.floor(+iconsize / 8)) + 'px' : '-10000px';
 			}
 		}, false);
 		document.body.appendChild(icon);
@@ -30,13 +30,13 @@ function handleLeaflet(iconsize, fLat, fLon, tooltip, hash) {
 	if(!document.getElementById('expifspy-leaflet-mudasobwa-id')) { /* create div to draw leaflet */
 		var leaflet = document.createElement('div');
 		leaflet.class = leaflet.id = 'expifspy-leaflet-mudasobwa-id';
-		leaflet.style.position = 'absolute';
+		leaflet.style.position = 'fixed';
 		leaflet.style.zIndex = 1001;
 		leaflet.style.top = leaflet.style.right = (+iconsize - Math.floor(+iconsize / 8)) + 'px';
 		leaflet.style.width = Math.min(window.innerWidth, 400) + 'px';
 		leaflet.style.height = Math.min(window.innerHeight, 300) + 'px';
 		leaflet.style.border = '1px solid #ddd';
-		leaflet.style.display = 'none';
+		leaflet.style.right = '-10000px';
 		document.body.appendChild(leaflet);
 	}
 
