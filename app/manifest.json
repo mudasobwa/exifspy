@@ -1,7 +1,7 @@
 {
     "name": "__MSG_extName__",
     "description": "__MSG_extDescription__",
-    "version": "1.0.3",
+    "version": "1.0.5",
     "manifest_version": 2,
     "default_locale": "en",
     "icons": {
@@ -44,7 +44,8 @@
                 "bower_components/jquery/dist/jquery.min.js",
                 "lib/jquery.exif.js",
                 "lib/leaflet.js",
-                "scripts/main.js"
+                "scripts/main.js",
+                "scripts/options.js"
             ],
             "css": [
                 "lib/leaflet.css"
