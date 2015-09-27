@@ -28,15 +28,16 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	switch(message.method) {
 		case 'showLocation':
 			// https://www.google.com/maps/place/41°22'52.0'N+2°07'12.0'E
-			if(message.lat && message.lon) {
-				chrome.tabs.create( { url: 'https://www.google.com/maps/place/' + message.lat + '+' + message.lon } );
+			if(message.sLat && message.sLon) {
+				chrome.tabs.create( { url: 'https://www.google.com/maps/place/' + message.sLat + '+' + message.sLon } );
 			}
 			break;
 		case 'updateMenu':
 			chrome.contextMenus.update(showMapItem, {enabled: (message.hasmap === 'true')});
 			break;
 		case 'getAddressByLatLng':
-			var url = 'http://geocode-maps.yandex.ru/1.x/?lang=en-US&format=json&geocode='+message.lat+','+message.lon;
+      // http://nominatim.openstreetmap.org/reverse?format=xml&lat=52.5487429714954&lon=-1.81602098644987&zoom=18&addressdetails=1
+			var url = 'http://nominatim.openstreetmap.org/reverse?format=json&lat='+message.fLat+'&lon='+message.fLon+'&zoom=18&addressdetails=1';
 			var xmlHttpReq = new XMLHttpRequest();
 			if(xmlHttpReq) {
 				xmlHttpReq.open('GET', url);
@@ -51,4 +52,3 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	}
 	return true;
 });
-

@@ -46,7 +46,7 @@ function restoreOptions() {
 }
 
 document.addEventListener('DOMContentLoaded', restoreOptions);
-document.getElementById('googlemapsapikey').addEventListener('change', saveOptions);
-document.getElementById('bordercolor').addEventListener('change', saveOptions);
-document.getElementById('borderwidth').addEventListener('change', saveOptions);
-document.getElementById('iconsize').addEventListener('change', saveOptions);
+document.getElementById('googlemapsapikey') && document.getElementById('googlemapsapikey').addEventListener('change', saveOptions);
+document.getElementById('bordercolor') && document.getElementById('bordercolor').addEventListener('change', saveOptions);
+document.getElementById('borderwidth') && document.getElementById('borderwidth').addEventListener('change', saveOptions);
+document.getElementById('iconsize') && document.getElementById('iconsize').addEventListener('change', saveOptions);

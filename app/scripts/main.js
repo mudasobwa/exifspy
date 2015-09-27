@@ -113,24 +113,28 @@ function updateImgBorders(color, width, iconsize) {
 			$('<a>').attr('id', hash).insertBefore($(image));
 
 			chrome.runtime.sendMessage(
-				{ method: 'getAddressByLatLng', id: counter, lat: sLat, lon: sLon },
+				{ method: 'getAddressByLatLng', id: counter, fLat: fLat, fLon: fLon, sLat: sLat, sLon: sLon },
 				function(response) {
-					var datas = JSON.parse(response.results).response.GeoObjectCollection;
-					var address;
-					if(datas) {
-						for (var i = 0; i < datas.featureMember.length; i++) {
-							if (datas.featureMember[i].GeoObject.metaDataProperty.GeocoderMetaData.precision === 'street') {
-								address = datas.featureMember[i].GeoObject.metaDataProperty.GeocoderMetaData.text;
-								break;
-							}
-						}
-						if (address !== 'undefined') {
-							var title = $(image).context.getAttribute('title');
-							title = (!title || title.match(/^\[.*?\]$/) ? '@ ' : title + '\n@ ') + address;
-							$(image).attr('title', title);
-						}
-					}
-					handleLeaflet(iconsize, fLat, fLon, address ? address : sLat + ' ' + sLon, hash);
+					// results: "{"place_id":"2584266797",
+					//           "licence":"Data © OpenStreetMap contributors, ODbL 1.0. http:\/\/www.openstreetmap.org\/copyright",
+					//           "osm_type":"node",
+					//           "osm_id":"1651341750",
+					//           "lat":"41.6868043","lon":"2.1635383",
+					//           "display_name":"Motos Figueras, Carrer d'Agustí Santacruz, Sant Feliu de Codines, Вальес-Орьенталь, Барселона, Каталония, 08140, Испания",
+					//           "address":{"address29":"Motos Figueras",
+					//                      "road":"Carrer d'Agustí Santacruz",
+					//                      "village":"Sant Feliu de Codines",
+					//                      "county":"Вальес-Орьенталь",
+					//                      "state":"Каталония",
+					//                      "postcode":"08140",
+					//                      "country":"Испания",
+					//                      "country_code":"es"}}"
+					var datas = JSON.parse(response.results).display_name || sLat + ' ' + sLon;
+					var title = $(image).context.getAttribute('title');
+					title = (!title || title.match(/^\[.*?\]$/) ? '@ ' : title + '\n@ ') + datas;
+					$(image).attr('title', title);
+
+					handleLeaflet(iconsize, fLat, fLon, datas, hash);
 				}
 			);
 			$(image).css({
@@ -157,4 +161,3 @@ $(document).ready(function() {
 		});
 
 });
-
